@@ -2,14 +2,16 @@ import express from "express";
 import { config } from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import authRoutes from "./modules/auth/authController.js";
-import { authMiddleware } from "./middleware/auth.js";
+import authRoutes from "./Modules/Auth/authController.js";
+import { authMiddleware } from "./Middleware/auth.js";
 import passport from "passport";
-import './config/passport.js';
-import { profileRoute } from "./modules/profile/profileController.js";
-import { paymentRoute } from "./modules/payment/paymentController.js";
-import { busAndRouteRoute } from "./modules/busAndRoute/busAndRouteController.js";
-import { bookingRoute } from "./modules/booking/bookingController.js";
+import './Config/passport.js';
+import { profileRoute } from "./Modules/Profile/profileController.js";
+import { paymentRoute } from "./Modules/Payment/paymentController.js";
+import { bookingRoute } from "./Modules/Booking/bookingController.js";
+import { busRoute } from "./Modules/Bus/busController.js";
+import routeRoute from "./Modules/Route/RouteController.js";
+import { busScheduleRoute } from "./Modules/Bus/BusSchedule/busScheduleController.js";
   
 
 
@@ -36,8 +38,10 @@ app.use(authMiddleware);
 app.use('/auth', authRoutes);
 app.use('/profile', profileRoute);
 app.use('/payment', paymentRoute);
-app.use('/busAndRoute', busAndRouteRoute);
+app.use('/bus', busRoute);
+app.use('/route', routeRoute);
 app.use('/booking', bookingRoute);
+app.use('/bus/schedule', busScheduleRoute);
 
 app.use
 app.listen(port, () => {

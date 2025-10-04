@@ -86,6 +86,7 @@ model Seat {
   rowNumber     Int?
   colNumber     Int?
   positionLabel String?
+   status        SeatStatus @default(AVAILABLE)
   bookingSeats  BookingSeat[]
   bus           Bus           @relation(fields: [busId], references: [id], onDelete: Cascade)
 }
@@ -243,4 +244,9 @@ enum NotificationType {
 enum Theme {
   LIGHT
   DARK
+}
+
+enum SeatStatus {
+  AVAILABLE
+  BOOKED
 }

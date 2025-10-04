@@ -1,7 +1,7 @@
 // modules/auth/authController.js
 import express, { Router } from 'express';
 import passport from 'passport';
-import { register, login, googleCallback, protectedRoute } from '../auth/authService.js';
+import { register, login, googleCallback, protectedRoute } from './authService.js';
 
 const authRoutes = Router();
 

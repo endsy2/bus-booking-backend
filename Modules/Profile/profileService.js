@@ -17,7 +17,7 @@ export const getProfile=async(req,res)=>{
         res.status(500).json({error:"Failed to fetch profile"})
     }
 }
-export const UpdateProfile=async(req,res)=>{
+export const updateProfile=async(req,res)=>{
     try {
         const userId=req.user.id;
         const image=req.file?req.file.path:null;
