@@ -8,78 +8,78 @@ datasource db {
 }
 
 model User {
-  id             BigInt          @id @default(autoincrement())
+  id             Int          @id @default(autoincrement())
   fullName       String
   email          String          @unique
   phone          String?         @unique
+  image          String?
   passwordHash   String
-  googleId       String?
+  googleId       String?        @unique
   biometricHash  String?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
-  paymentMethods PaymentMethod[]
   bookings       Booking[]
-  promoUsages    PromoUsage[]
   notifications  Notification[]
+  paymentMethods PaymentMethod[]
+  promoUsages    PromoUsage[]
   preferences    UserPreference?
 }
 
 model PaymentMethod {
-  id             BigInt   @id @default(autoincrement())
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId         BigInt
+  id             Int    @id @default(autoincrement())
+  userId         Int
   cardNumber     String?
   cardHolder     String?
   expiryDate     DateTime?
   cvv            String?
   walletProvider String?
   khqrCode       String?
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model BusRoute {
-  id        BigInt @id @default(autoincrement())
-  origin    String
-  destination String
-  distanceKm Float?
+  id              Int @id @default(autoincrement())
+  origin          String
+  destination     String
+  distanceKm      Float?
   durationMinutes Int?
-  buses     Bus[]
+  buses           Bus[]
 }
 
 model Bus {
-  id          BigInt @id @default(autoincrement())
-  route       BusRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
-  routeId     BigInt
-  busNumber   String   @unique
-  busType     BusType
-  totalSeats  Int
+  id           Int        @id @default(autoincrement())
+  routeId      Int
+  busNumber    String        @unique
+  busType      BusType
+  totalSeats   Int
   operatorName String?
-  schedules   BusSchedule[]
-  seats       Seat[]
-  layout      BusLayout?
+  route        BusRoute      @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  layout       BusLayout?
+  schedules    BusSchedule[]
+  seats        Seat[]
 }
 
 model BusSchedule {
-  id           BigInt @id @default(autoincrement())
-  bus          Bus @relation(fields: [busId], references: [id], onDelete: Cascade)
-  busId        BigInt
+  id            Int    @id @default(autoincrement())
+  busId         Int
   departureTime DateTime?
   arrivalTime   DateTime?
-  price        Float?
-  bookings     Booking[]
+  price         Float?
+  bookings      Booking[]
+  bus           Bus       @relation(fields: [busId], references: [id], onDelete: Cascade)
 }
 
 model BusLayout {
-  id      BigInt @id @default(autoincrement())
-  bus     Bus @relation(fields: [busId], references: [id], onDelete: Cascade)
-  busId   BigInt @unique
-  layout  Json
+  id        Int   @id @default(autoincrement())
+  busId     Int   @unique
+  layout    Json
   createdAt DateTime @default(now())
+  bus       Bus      @relation(fields: [busId], references: [id], onDelete: Cascade)
 }
 
 model Seat {
-  id            BigInt @id @default(autoincrement())
-  bus           Bus @relation(fields: [busId], references: [id], onDelete: Cascade)
-  busId         BigInt
+  id            Int        @id @default(autoincrement())
+  busId         Int
   seatNumber    String?
   seatType      SeatType
   price         Float?
@@ -87,100 +87,101 @@ model Seat {
   colNumber     Int?
   positionLabel String?
   bookingSeats  BookingSeat[]
+  bus           Bus           @relation(fields: [busId], references: [id], onDelete: Cascade)
 }
 
 model Booking {
-  id            BigInt @id @default(autoincrement())
-  user          User @relation(fields: [userId], references: [id])
-  userId        BigInt
-  schedule      BusSchedule @relation(fields: [scheduleId], references: [id])
-  scheduleId    BigInt
+  id            Int        @id @default(autoincrement())
+  userId        Int
+  scheduleId    Int
   bookingStatus BookingStatus @default(PENDING)
   totalAmount   Float?
-  promo         PromoCode? @relation(fields: [promoId], references: [id])
-  promoId       BigInt?
+  promoId       Int?
   paymentStatus PaymentStatus @default(PENDING)
-  createdAt     DateTime @default(now())
+  createdAt     DateTime      @default(now())
+  promo         PromoCode?    @relation(fields: [promoId], references: [id])
+  schedule      BusSchedule   @relation(fields: [scheduleId], references: [id])
+  user          User          @relation(fields: [userId], references: [id])
   bookingSeats  BookingSeat[]
   payments      Payment[]
-  tickets       Ticket[]
   promoUsages   PromoUsage[]
+  tickets       Ticket[]
 }
 
 model BookingSeat {
-  id                BigInt @id @default(autoincrement())
-  booking           Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  bookingId         BigInt
-  seat              Seat @relation(fields: [seatId], references: [id], onDelete: Cascade)
-  seatId            BigInt
+  id                Int  @id @default(autoincrement())
+  bookingId         Int
+  seatId            Int
   passengerName     String?
   passengerAge      Int?
   passengerGender   Gender?
   passengerIdNumber String?
+  booking           Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  seat              Seat    @relation(fields: [seatId], references: [id], onDelete: Cascade)
 }
 
 model Payment {
-  id          BigInt @id @default(autoincrement())
-  booking     Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  bookingId   BigInt
-  amount      Float?
-  method      PaymentMethodType
+  id            Int            @id @default(autoincrement())
+  bookingId     Int
+  amount        Float?
+  method        PaymentMethodType
   transactionId String?
-  status      PaymentStatus @default(PENDING)
-  paidAt      DateTime?
+  status        PaymentStatus     @default(PENDING)
+  paidAt        DateTime?
+  booking       Booking           @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 }
 
 model PromoCode {
-  id           BigInt @id @default(autoincrement())
-  code         String @unique
-  description  String?
-  discountType DiscountType
+  id            Int       @id @default(autoincrement())
+  code          String       @unique
+  description   String?
+  discountType  DiscountType
   discountValue Float
-  maxUses      Int?
-  usedCount    Int @default(0)
-  validFrom    DateTime?
-  validTo      DateTime?
-  status       PromoStatus @default(ACTIVE)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  promoUsages  PromoUsage[]
-  bookings     Booking[]
+  maxUses       Int?
+  usedCount     Int          @default(0)
+  validFrom     DateTime?
+  validTo       DateTime?
+  status        PromoStatus  @default(ACTIVE)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  bookings      Booking[]
+  promoUsages   PromoUsage[]
 }
 
 model PromoUsage {
-  id        BigInt @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
+  promoId   Int
+  userId    Int
+  bookingId Int
+  usedAt    DateTime  @default(now())
+  booking   Booking   @relation(fields: [bookingId], references: [id])
   promo     PromoCode @relation(fields: [promoId], references: [id])
-  promoId   BigInt
-  user      User @relation(fields: [userId], references: [id])
-  userId    BigInt
-  booking   Booking @relation(fields: [bookingId], references: [id])
-  bookingId BigInt
-  usedAt    DateTime @default(now())
+  user      User      @relation(fields: [userId], references: [id])
 }
 
 model Ticket {
-  id        BigInt @id @default(autoincrement())
-  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  bookingId BigInt
+  id        Int   @id @default(autoincrement())
+  bookingId Int
   qrCode    String?
   issuedAt  DateTime @default(now())
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
-  id        BigInt @id @default(autoincrement())
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    BigInt
+  id        Int           @id @default(autoincrement())
+  userId    Int
   type      NotificationType
   message   String?
-  isRead    Boolean @default(false)
-  createdAt DateTime @default(now())
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserPreference {
-  id        BigInt @id @default(autoincrement())
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    BigInt @unique
-  theme     Theme @default(LIGHT)
+  id     Int @id @default(autoincrement())
+  userId Int @unique
+  theme  Theme  @default(LIGHT)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum BusType {

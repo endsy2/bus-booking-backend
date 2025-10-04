@@ -1,16 +1,26 @@
 import express from "express";
-import swaggerUi from "swagger-ui-express";
-import swaggerJsdoc from "swagger-jsdoc";
 import { config } from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import authRoutes from "./modules/auth/authController.js";
+import { authMiddleware } from "./middleware/auth.js";
+import passport from "passport";
+import './config/passport.js';
+import { profileRoute } from "./modules/profile/profileController.js";
+import { paymentRoute } from "./modules/payment/paymentController.js";
+import { busAndRouteRoute } from "./modules/busAndRoute/busAndRouteController.js";
+import { bookingRoute } from "./modules/booking/bookingController.js";
+  
+
 
 config(); // Load environment variables
 
 const app = express();
 const port = process.env.PORT || 3000; 
 
+
 app.use(express.json());
+app.use(passport.initialize());
 app.use(cookieParser());
 app.use(express.static("uploads"));
 app.use(
@@ -21,35 +31,15 @@ app.use(
 );
 
 
-// Swagger definition
-const swaggerOptions = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "My Express API",
-      version: "1.0.0",
-      description: "API documentation with Swagger",
-    },
-    servers: [
-      {
-        url: "http://localhost:3000", // Your API base URL
-      },
-    ],
-  },
-  apis: ["./routes/*.js"], // Path to API docs
-};
+app.use(authMiddleware);
+// all route
+app.use('/auth', authRoutes);
+app.use('/profile', profileRoute);
+app.use('/payment', paymentRoute);
+app.use('/busAndRoute', busAndRouteRoute);
+app.use('/booking', bookingRoute);
 
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
-
-// Swagger UI route
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-// Example route
-app.get("/hello", (req, res) => {
-  res.send("Hello World!");
-});
-
+app.use
 app.listen(port, () => {
   console.log(`🚀 Server running on http://localhost:${port}`);
-  console.log(`📖 Swagger docs available at http://localhost:${port}/api-docs`);
 });

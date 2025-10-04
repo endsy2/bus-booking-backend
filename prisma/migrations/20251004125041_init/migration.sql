@@ -30,7 +30,7 @@ CREATE TYPE "Theme" AS ENUM ('LIGHT', 'DARK');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" BIGSERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "fullName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone" TEXT,
@@ -45,8 +45,8 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "PaymentMethod" (
-    "id" BIGSERIAL NOT NULL,
-    "userId" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
     "cardNumber" TEXT,
     "cardHolder" TEXT,
     "expiryDate" TIMESTAMP(3),
@@ -59,7 +59,7 @@ CREATE TABLE "PaymentMethod" (
 
 -- CreateTable
 CREATE TABLE "BusRoute" (
-    "id" BIGSERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "origin" TEXT NOT NULL,
     "destination" TEXT NOT NULL,
     "distanceKm" DOUBLE PRECISION,
@@ -70,8 +70,8 @@ CREATE TABLE "BusRoute" (
 
 -- CreateTable
 CREATE TABLE "Bus" (
-    "id" BIGSERIAL NOT NULL,
-    "routeId" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "routeId" INTEGER NOT NULL,
     "busNumber" TEXT NOT NULL,
     "busType" "BusType" NOT NULL,
     "totalSeats" INTEGER NOT NULL,
@@ -82,8 +82,8 @@ CREATE TABLE "Bus" (
 
 -- CreateTable
 CREATE TABLE "BusSchedule" (
-    "id" BIGSERIAL NOT NULL,
-    "busId" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "busId" INTEGER NOT NULL,
     "departureTime" TIMESTAMP(3),
     "arrivalTime" TIMESTAMP(3),
     "price" DOUBLE PRECISION,
@@ -93,8 +93,8 @@ CREATE TABLE "BusSchedule" (
 
 -- CreateTable
 CREATE TABLE "BusLayout" (
-    "id" BIGSERIAL NOT NULL,
-    "busId" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "busId" INTEGER NOT NULL,
     "layout" JSONB NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -103,8 +103,8 @@ CREATE TABLE "BusLayout" (
 
 -- CreateTable
 CREATE TABLE "Seat" (
-    "id" BIGSERIAL NOT NULL,
-    "busId" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "busId" INTEGER NOT NULL,
     "seatNumber" TEXT,
     "seatType" "SeatType" NOT NULL,
     "price" DOUBLE PRECISION,
@@ -117,12 +117,12 @@ CREATE TABLE "Seat" (
 
 -- CreateTable
 CREATE TABLE "Booking" (
-    "id" BIGSERIAL NOT NULL,
-    "userId" BIGINT NOT NULL,
-    "scheduleId" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "scheduleId" INTEGER NOT NULL,
     "bookingStatus" "BookingStatus" NOT NULL DEFAULT 'PENDING',
     "totalAmount" DOUBLE PRECISION,
-    "promoId" BIGINT,
+    "promoId" INTEGER,
     "paymentStatus" "PaymentStatus" NOT NULL DEFAULT 'PENDING',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -131,9 +131,9 @@ CREATE TABLE "Booking" (
 
 -- CreateTable
 CREATE TABLE "BookingSeat" (
-    "id" BIGSERIAL NOT NULL,
-    "bookingId" BIGINT NOT NULL,
-    "seatId" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "bookingId" INTEGER NOT NULL,
+    "seatId" INTEGER NOT NULL,
     "passengerName" TEXT,
     "passengerAge" INTEGER,
     "passengerGender" "Gender",
@@ -144,8 +144,8 @@ CREATE TABLE "BookingSeat" (
 
 -- CreateTable
 CREATE TABLE "Payment" (
-    "id" BIGSERIAL NOT NULL,
-    "bookingId" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "bookingId" INTEGER NOT NULL,
     "amount" DOUBLE PRECISION,
     "method" "PaymentMethodType" NOT NULL,
     "transactionId" TEXT,
@@ -157,7 +157,7 @@ CREATE TABLE "Payment" (
 
 -- CreateTable
 CREATE TABLE "PromoCode" (
-    "id" BIGSERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "code" TEXT NOT NULL,
     "description" TEXT,
     "discountType" "DiscountType" NOT NULL,
@@ -175,10 +175,10 @@ CREATE TABLE "PromoCode" (
 
 -- CreateTable
 CREATE TABLE "PromoUsage" (
-    "id" BIGSERIAL NOT NULL,
-    "promoId" BIGINT NOT NULL,
-    "userId" BIGINT NOT NULL,
-    "bookingId" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "promoId" INTEGER NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "bookingId" INTEGER NOT NULL,
     "usedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "PromoUsage_pkey" PRIMARY KEY ("id")
@@ -186,8 +186,8 @@ CREATE TABLE "PromoUsage" (
 
 -- CreateTable
 CREATE TABLE "Ticket" (
-    "id" BIGSERIAL NOT NULL,
-    "bookingId" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "bookingId" INTEGER NOT NULL,
     "qrCode" TEXT,
     "issuedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -196,8 +196,8 @@ CREATE TABLE "Ticket" (
 
 -- CreateTable
 CREATE TABLE "Notification" (
-    "id" BIGSERIAL NOT NULL,
-    "userId" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
     "type" "NotificationType" NOT NULL,
     "message" TEXT,
     "isRead" BOOLEAN NOT NULL DEFAULT false,
@@ -208,8 +208,8 @@ CREATE TABLE "Notification" (
 
 -- CreateTable
 CREATE TABLE "UserPreference" (
-    "id" BIGSERIAL NOT NULL,
-    "userId" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
     "theme" "Theme" NOT NULL DEFAULT 'LIGHT',
 
     CONSTRAINT "UserPreference_pkey" PRIMARY KEY ("id")
@@ -220,6 +220,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_googleId_key" ON "User"("googleId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Bus_busNumber_key" ON "Bus"("busNumber");
@@ -249,13 +252,13 @@ ALTER TABLE "BusLayout" ADD CONSTRAINT "BusLayout_busId_fkey" FOREIGN KEY ("busI
 ALTER TABLE "Seat" ADD CONSTRAINT "Seat_busId_fkey" FOREIGN KEY ("busId") REFERENCES "Bus"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Booking" ADD CONSTRAINT "Booking_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Booking" ADD CONSTRAINT "Booking_promoId_fkey" FOREIGN KEY ("promoId") REFERENCES "PromoCode"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Booking" ADD CONSTRAINT "Booking_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "BusSchedule"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Booking" ADD CONSTRAINT "Booking_promoId_fkey" FOREIGN KEY ("promoId") REFERENCES "PromoCode"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Booking" ADD CONSTRAINT "Booking_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "BookingSeat" ADD CONSTRAINT "BookingSeat_bookingId_fkey" FOREIGN KEY ("bookingId") REFERENCES "Booking"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -267,13 +270,13 @@ ALTER TABLE "BookingSeat" ADD CONSTRAINT "BookingSeat_seatId_fkey" FOREIGN KEY (
 ALTER TABLE "Payment" ADD CONSTRAINT "Payment_bookingId_fkey" FOREIGN KEY ("bookingId") REFERENCES "Booking"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "PromoUsage" ADD CONSTRAINT "PromoUsage_bookingId_fkey" FOREIGN KEY ("bookingId") REFERENCES "Booking"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "PromoUsage" ADD CONSTRAINT "PromoUsage_promoId_fkey" FOREIGN KEY ("promoId") REFERENCES "PromoCode"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PromoUsage" ADD CONSTRAINT "PromoUsage_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "PromoUsage" ADD CONSTRAINT "PromoUsage_bookingId_fkey" FOREIGN KEY ("bookingId") REFERENCES "Booking"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_bookingId_fkey" FOREIGN KEY ("bookingId") REFERENCES "Booking"("id") ON DELETE CASCADE ON UPDATE CASCADE;

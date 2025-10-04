@@ -1,24 +1,29 @@
-// routes/auth.js
-const express = require('express');
-const passport = require('passport');
-const router = express.Router();
-const authController = require('../controllers/authController');
+// modules/auth/authController.js
+import express, { Router } from 'express';
+import passport from 'passport';
+import { register, login, googleCallback, protectedRoute } from '../auth/authService.js';
+
+const authRoutes = Router();
 
 // Local Register/Login
-router.post('/register', authController.register);
-router.post('/login', authController.login);
+authRoutes.post('/register', register);
+authRoutes.post('/login', login);
 
-// Google OAuth
-router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-router.get('/auth/google/callback',
+// Google OAuth Routes
+authRoutes.get(
+  '/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+authRoutes.get(
+  '/auth/google/callback',
   passport.authenticate('google', { session: false }),
-  authController.googleCallback
+  googleCallback
 );
-
-// Protected Route with JWT
-router.get('/dashboard',
+// Protected Route
+authRoutes.get(
+  '/dashboard',
   passport.authenticate('jwt', { session: false }),
-  authController.protected
+  protectedRoute
 );
 
-module.exports = router;
+export default authRoutes;

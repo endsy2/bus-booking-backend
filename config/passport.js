@@ -1,17 +1,17 @@
 // config/passport.js
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-const passport = require('passport');
-const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
+import { PrismaClient } from '@prisma/client';
+import passport from 'passport';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 
+const prisma = new PrismaClient();
 // JWT Strategy
 passport.use(new JwtStrategy({
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: process.env.JWT_SECRET
 }, async (payload, done) => {
   try {
-    const user = await prisma.user.findUnique({ where: { id: BigInt(payload.id) } });
+    const user = await prisma.user.findUnique({ where: { id: parseInt(payload.id) } });
     if (!user) return done(null, false);
     return done(null, user);
   } catch (err) {
@@ -33,9 +33,10 @@ passport.use(new GoogleStrategy({
         data: {
           fullName: profile.displayName,
           email: profile.emails[0].value,
+          image: profile.photos[0].value,
           passwordHash: "",  // no password for google users
           googleId: profile.id,
-        }
+        } 
       });
     }
 
@@ -44,3 +45,6 @@ passport.use(new GoogleStrategy({
     return done(err, false);
   }
 }));
+
+
+
