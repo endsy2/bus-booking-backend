@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 export const getAllLayouts = async (req, res) => {
   try {
-    const layouts = await prisma.busLayout.findMany({ include: { bus: true } });
+    const layouts = await prisma.busLayout.findMany();
     res.json(layouts);
   } catch (error) {
     console.error(error);
@@ -25,11 +25,15 @@ export const getLayout = async (req, res) => {
 };
 
 export const createLayout = async (req, res) => {
-  const { busId, layout } = req.body;
+  const { name, layout } = req.body;
   try {
-    const newLayout = await prisma.busLayout.create({
-      data: { busId, layout },
+      const newLayout = await prisma.busLayout.create({
+      data: {
+        name: name,         // optional
+        layout: layout      // must be valid JSON
+      }
     });
+    console.log(newLayout); // will contain id
     res.status(201).json(newLayout);
   } catch (error) {
     console.error(error);

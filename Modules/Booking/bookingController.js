@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { bookSeats, cancelBooking } from "./bookingService";
+import { bookSeats, cancelBooking } from "./bookingService.js";
 
 const bookingRoute = Router();
 

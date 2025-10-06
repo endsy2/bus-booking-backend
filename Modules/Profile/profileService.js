@@ -6,8 +6,8 @@ const prisma=new PrismaClient();
 export const getProfile=async(req,res)=>{
     try {
         const userId=req.user.id;
-        const profile=await prisma.profile.findUnique({
-            where:{userId}
+        const profile=await prisma.user.findUnique({
+            where:{id:userId}
         })
         if(!profile){
             return res.status(404).json({error:"Profile not found"})
@@ -21,11 +21,12 @@ export const updateProfile=async(req,res)=>{
     try {
         const userId=req.user.id;
         const image=req.file?req.file.path:null;
-        const {name,phone,address}=req.body;
-        const updatedProfile=await prisma.profile.upsert({
-            where:{userId},
-            update:{name,phone,address,image},
-            create:{userId,name,phone,address,image}
+        const {fullname,phone,address}=req.body;
+        res.json({userId,fullname,phone,address,image})
+        const updatedProfile=await prisma.user.upsert({
+            where:{id:userId},
+            update:{fullname,phone,address,image},
+            create:{fullname,phone,address,image}
         })
         res.json({message:"Profile Updated",profile:updatedProfile})
     } catch (error) {

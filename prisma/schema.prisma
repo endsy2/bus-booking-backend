@@ -8,16 +8,16 @@ datasource db {
 }
 
 model User {
-  id             Int          @id @default(autoincrement())
+  id             Int             @id @default(autoincrement())
   fullName       String
   email          String          @unique
   phone          String?         @unique
-  image          String?
   passwordHash   String
-  googleId       String?        @unique
+  googleId       String?         @unique
   biometricHash  String?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+  image          String?
   bookings       Booking[]
   notifications  Notification[]
   paymentMethods PaymentMethod[]
@@ -26,7 +26,7 @@ model User {
 }
 
 model PaymentMethod {
-  id             Int    @id @default(autoincrement())
+  id             Int       @id @default(autoincrement())
   userId         Int
   cardNumber     String?
   cardHolder     String?
@@ -38,7 +38,7 @@ model PaymentMethod {
 }
 
 model BusRoute {
-  id              Int @id @default(autoincrement())
+  id              Int    @id @default(autoincrement())
   origin          String
   destination     String
   distanceKm      Float?
@@ -47,20 +47,29 @@ model BusRoute {
 }
 
 model Bus {
-  id           Int        @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   routeId      Int
   busNumber    String        @unique
   busType      BusType
   totalSeats   Int
   operatorName String?
+  layoutId     Int?
+  layout       BusLayout?    @relation(fields: [layoutId], references: [id])
   route        BusRoute      @relation(fields: [routeId], references: [id], onDelete: Cascade)
-  layout       BusLayout?
   schedules    BusSchedule[]
   seats        Seat[]
 }
 
+model BusLayout {
+  id        Int      @id @default(autoincrement())
+  layout    Json
+  createdAt DateTime @default(now())
+  name      String?
+  buses     Bus[]
+}
+
 model BusSchedule {
-  id            Int    @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   busId         Int
   departureTime DateTime?
   arrivalTime   DateTime?
@@ -69,30 +78,32 @@ model BusSchedule {
   bus           Bus       @relation(fields: [busId], references: [id], onDelete: Cascade)
 }
 
-model BusLayout {
-  id        Int   @id @default(autoincrement())
-  busId     Int   @unique
-  layout    Json
-  createdAt DateTime @default(now())
-  bus       Bus      @relation(fields: [busId], references: [id], onDelete: Cascade)
-}
-
 model Seat {
-  id            Int        @id @default(autoincrement())
+  id            Int           @id @default(autoincrement())
   busId         Int
   seatNumber    String?
   seatType      SeatType
   price         Float?
-  rowNumber     Int?
-  colNumber     Int?
   positionLabel String?
-   status        SeatStatus @default(AVAILABLE)
+  status        SeatStatus    @default(AVAILABLE)
   bookingSeats  BookingSeat[]
   bus           Bus           @relation(fields: [busId], references: [id], onDelete: Cascade)
 }
 
+model BookingSeat {
+  id                Int     @id @default(autoincrement())
+  bookingId         Int
+  seatId            Int
+  passengerName     String?
+  passengerAge      Int?
+  passengerGender   Gender?
+  passengerIdNumber String?
+  booking           Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  seat              Seat    @relation(fields: [seatId], references: [id], onDelete: Cascade)
+}
+
 model Booking {
-  id            Int        @id @default(autoincrement())
+  id            Int           @id @default(autoincrement())
   userId        Int
   scheduleId    Int
   bookingStatus BookingStatus @default(PENDING)
@@ -109,20 +120,8 @@ model Booking {
   tickets       Ticket[]
 }
 
-model BookingSeat {
-  id                Int  @id @default(autoincrement())
-  bookingId         Int
-  seatId            Int
-  passengerName     String?
-  passengerAge      Int?
-  passengerGender   Gender?
-  passengerIdNumber String?
-  booking           Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  seat              Seat    @relation(fields: [seatId], references: [id], onDelete: Cascade)
-}
-
 model Payment {
-  id            Int            @id @default(autoincrement())
+  id            Int               @id @default(autoincrement())
   bookingId     Int
   amount        Float?
   method        PaymentMethodType
@@ -133,7 +132,7 @@ model Payment {
 }
 
 model PromoCode {
-  id            Int       @id @default(autoincrement())
+  id            Int          @id @default(autoincrement())
   code          String       @unique
   description   String?
   discountType  DiscountType
@@ -150,7 +149,7 @@ model PromoCode {
 }
 
 model PromoUsage {
-  id        Int    @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   promoId   Int
   userId    Int
   bookingId Int
@@ -161,7 +160,7 @@ model PromoUsage {
 }
 
 model Ticket {
-  id        Int   @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   bookingId Int
   qrCode    String?
   issuedAt  DateTime @default(now())
@@ -169,7 +168,7 @@ model Ticket {
 }
 
 model Notification {
-  id        Int           @id @default(autoincrement())
+  id        Int              @id @default(autoincrement())
   userId    Int
   type      NotificationType
   message   String?
@@ -179,10 +178,10 @@ model Notification {
 }
 
 model UserPreference {
-  id     Int @id @default(autoincrement())
-  userId Int @unique
-  theme  Theme  @default(LIGHT)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     Int   @id @default(autoincrement())
+  userId Int   @unique
+  theme  Theme @default(LIGHT)
+  user   User  @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum BusType {
