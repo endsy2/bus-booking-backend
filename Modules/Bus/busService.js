@@ -61,13 +61,12 @@ res.status(200).json(buses);
 
 export const getAllBuses = async (req, res) => {
     try {
-          const buses = await prisma.bus.findMany({ include: { route: true, schedules: true, layout: true } });
-  res.json(buses);
+          const buses = await prisma.bus.findMany({ include: { route: true, schedules: true, layout: true ,seats:true} });
+        res.json(buses);
     } catch (error) {
       console.error("Error fetching buses:", error);
       res.status(500).json({ error: "Internal server error" });
     }
-
 };
 
 
@@ -76,7 +75,7 @@ export const getBus = async (req, res) => {
     const id = parseInt(req.params.id);
     const bus = await prisma.bus.findUnique({ 
     where: { id }, 
-    include: { busSeats: true, route: true, schedules: true, layout: true } 
+    include: {  seats:true, route: true, schedules: true, layout: true } 
   });
   if (!bus) return res.status(404).json({ message: "Bus not found" });
     res.json(bus);

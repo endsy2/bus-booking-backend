@@ -4,5 +4,5 @@ import { bookSeats, cancelBooking } from "./bookingService.js";
 const bookingRoute = Router();
 
 bookingRoute.post('/bookSeat',bookSeats)
-bookingRoute.post('/cancelBooking',cancelBooking)
+bookingRoute.post('/cancelBooking/:bookingId',cancelBooking)
 export { bookingRoute };

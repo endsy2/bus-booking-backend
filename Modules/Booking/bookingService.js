@@ -3,7 +3,8 @@ const prisma = new PrismaClient();
 
 export const bookSeats = async (req, res) => {
   try {
-    const { userId, scheduleId, seatIds, promoCode } = req.body;
+    const userId = req.user.id;
+    const { scheduleId, seatIds, promoCode } = req.body;
 
     // 1. Check if seats exist and are available
     const seats = await prisma.seat.findMany({

@@ -5,8 +5,8 @@ const routeRoute = Router();
 
 routeRoute.get('/', getAllRoutes);
 routeRoute.get('/:id', getRoute);
-routeRoute.post('/', createRoute);
-routeRoute.put('/:id', updateRoute);
-routeRoute.delete('/:id', deleteRoute);
+routeRoute.post('/', createRoute);//testing
+routeRoute.put('/:id', updateRoute);//testing
+routeRoute.delete('/:id', deleteRoute);//testing
 
 export default routeRoute;
